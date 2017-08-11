@@ -20,6 +20,9 @@ class FallthroughCache(BaseCache):
 
         self.caches = [caches[name] for name in cache_names]
 
+    def add(self, key, value, version=None, **kwargs):
+        return self.caches[-1].add(key, value, version=version)
+
     def get(self, key, default=None, version=None):
         return self._get_with_fallthrough(key, 0, default=default,
                                           version=version)

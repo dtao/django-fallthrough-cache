@@ -115,6 +115,18 @@ def test_set_many():
     }
 
 
+def test_add_updates_bottom_cache():
+    cache = FallthroughCache.create(['a', 'b', 'c'])
+
+    cache.add('foo', 1)
+
+    assert caches['c'].get('foo') == 1
+
+    # Ensure calling add does not replace existing value
+    cache.add('foo', 2)
+    assert caches['c'].get('foo') == 1
+
+
 def test_delete_updates_bottom_cache():
     cache = FallthroughCache.create(['a', 'b', 'c'])
 
