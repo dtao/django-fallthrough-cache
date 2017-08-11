@@ -21,6 +21,16 @@ def test_get_picks_first_result():
     assert cache.get('foo') == 1
 
 
+def test_get_supports_default():
+    cache = FallthroughCache.create(['a', 'b', 'c'])
+
+    caches['a'].set('foo', 1)
+    caches['b'].set('bar', 2)
+    caches['c'].set('baz', 3)
+
+    assert cache.get('quux', default=4) == 4
+
+
 def test_get_many():
     cache = FallthroughCache.create(['a', 'b', 'c'])
 
