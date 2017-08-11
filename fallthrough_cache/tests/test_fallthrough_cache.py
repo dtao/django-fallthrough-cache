@@ -31,6 +31,22 @@ def test_get_supports_default():
     assert cache.get('quux', default=4) == 4
 
 
+def test_get_respects_version():
+    cache = FallthroughCache.create(['a', 'b', 'c'])
+
+    caches['a'].set('foo', 1, version=1)
+    caches['b'].set('foo', 2, version=2)
+    caches['c'].set('foo', 3, version=3)
+
+    assert cache.get('foo', version=4) is None
+    assert cache.get('foo', version=2) == 2
+
+    # Ensure existing versions have not been overwritten
+    assert caches['a'].get('foo', version=1) == 1
+    assert caches['b'].get('foo', version=2) == 2
+    assert caches['c'].get('foo', version=3) == 3
+
+
 def test_get_many():
     cache = FallthroughCache.create(['a', 'b', 'c'])
 
@@ -77,6 +93,16 @@ def test_set_updates_bottom_cache():
     assert caches['c'].get('foo') == 3
 
 
+def test_set_respects_version():
+    cache = FallthroughCache.create(['a', 'b', 'c'])
+
+    cache.set('foo', 3, version=2)
+
+    assert caches['c'].get('foo') is None
+    assert caches['c'].get('foo', version=1) is None
+    assert caches['c'].get('foo', version=2) == 3
+
+
 def test_set_many():
     cache = FallthroughCache.create(['a', 'b', 'c'])
 
@@ -99,6 +125,20 @@ def test_delete_updates_bottom_cache():
     cache.delete('foo')
 
     assert caches['c'].get('foo') is None
+
+
+def test_delete_respects_version():
+    cache = FallthroughCache.create(['a', 'b', 'c'])
+
+    caches['c'].set('foo', 1, version=1)
+    caches['c'].set('foo', 2, version=2)
+    caches['c'].set('foo', 3, version=3)
+
+    cache.delete('foo', version=2)
+
+    assert caches['c'].get('foo', version=1) == 1
+    assert caches['c'].get('foo', version=2) is None
+    assert caches['c'].get('foo', version=3) == 3
 
 
 def test_delete_many():

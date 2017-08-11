@@ -20,18 +20,21 @@ class FallthroughCache(BaseCache):
 
         self.caches = [caches[name] for name in cache_names]
 
-    def get(self, key, default=None, **kwargs):
-        return self._get_with_fallthrough(key, 0, default=default)
+    def get(self, key, default=None, version=None):
+        return self._get_with_fallthrough(key, 0, default=default,
+                                          version=version)
 
-    def set(self, key, value, *args, **kwargs):
-        self.caches[-1].set(key, value)
+    def set(self, key, value, version=None, **kwargs):
+        self.caches[-1].set(key, value, version=version)
 
-    def delete(self, key, *args, **kwargs):
-        self.caches[-1].delete(key)
+    def delete(self, key, version=None):
+        self.caches[-1].delete(key, version=version)
 
-    def _get_with_fallthrough(self, key, index, default):
+    def _get_with_fallthrough(self, key, index, default, version):
         cache = self.caches[index]
         if index == len(self.caches) - 1:
-            return cache.get(key, default=default)
+            return cache.get(key, default=default, version=version)
         return cache.get_or_set(
-            key, lambda: self._get_with_fallthrough(key, index + 1, default))
+            key, lambda: self._get_with_fallthrough(key, index + 1, default,
+                                                    version),
+            version=version)
