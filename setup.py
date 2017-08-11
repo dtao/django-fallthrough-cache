@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 
 setup(
     name='django-fallthrough-cache',
-    version='0.1.0',
+    version='0.1.1',
     description='A Django cache backend with fallthrough',
     author='Dan Tao',
     author_email='daniel.tao@gmail.com',
