@@ -1,7 +1,8 @@
 from django.core.cache import caches
+from django.core.cache.backends.base import BaseCache
 
 
-class FallthroughCache(object):
+class FallthroughCache(BaseCache):
     @classmethod
     def create(cls, cache_names):
         return cls(None, {
@@ -19,13 +20,13 @@ class FallthroughCache(object):
 
         self.caches = [caches[name] for name in cache_names]
 
-    def get(self, key):
+    def get(self, key, *args, **kwargs):
         return self._get_with_fallthrough(key, 0)
 
-    def set(self, key, value):
+    def set(self, key, value, *args, **kwargs):
         self.caches[-1].set(key, value)
 
-    def delete(self, key):
+    def delete(self, key, *args, **kwargs):
         self.caches[-1].delete(key)
 
     def _get_with_fallthrough(self, key, index):

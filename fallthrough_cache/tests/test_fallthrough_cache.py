@@ -21,6 +21,23 @@ def test_get_picks_first_result():
     assert cache.get('foo') == 1
 
 
+def test_get_many():
+    cache = FallthroughCache.create(['a', 'b', 'c'])
+
+    caches['a'].add('foo', 1)
+    caches['b'].add('bar', 2)
+    caches['c'].add('baz', 3)
+
+    assert cache.get_many(['foo', 'bar', 'baz']) == {
+        'foo': 1,
+        'bar': 2,
+        'baz': 3
+    }
+    assert caches['a'].get('bar') == 2
+    assert caches['a'].get('baz') == 3
+    assert caches['b'].get('baz') == 3
+
+
 def test_get_falls_through():
     cache = FallthroughCache.create(['a', 'b', 'c'])
 
@@ -50,6 +67,18 @@ def test_set_updates_bottom_cache():
     assert caches['c'].get('foo') == 3
 
 
+def test_set_many():
+    cache = FallthroughCache.create(['a', 'b', 'c'])
+
+    cache.set_many({'foo': 1, 'bar': 2, 'baz': 3})
+
+    assert caches['c'].get_many(['foo', 'bar', 'baz']) == {
+        'foo': 1,
+        'bar': 2,
+        'baz': 3
+    }
+
+
 def test_delete_updates_bottom_cache():
     cache = FallthroughCache.create(['a', 'b', 'c'])
 
@@ -60,6 +89,17 @@ def test_delete_updates_bottom_cache():
     cache.delete('foo')
 
     assert caches['c'].get('foo') is None
+
+
+def test_delete_many():
+    cache = FallthroughCache.create(['a', 'b', 'c'])
+
+    caches['c'].set('foo', 1)
+    caches['c'].set('bar', 2)
+    caches['c'].set('baz', 3)
+
+    cache.delete_many(['bar', 'baz'])
+    assert caches['c'].get_many(['foo', 'bar', 'baz']) == {'foo': 1}
 
 
 def test_django_configuration():
