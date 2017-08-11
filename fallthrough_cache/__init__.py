@@ -31,8 +31,14 @@ class FallthroughCache(BaseCache):
     def set(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
         self.caches[-1].set(key, value, timeout=timeout, version=version)
 
+    def set_many(self, data, timeout=DEFAULT_TIMEOUT, version=None):
+        self.caches[-1].set_many(data, timeout=timeout, version=version)
+
     def delete(self, key, version=None):
         self.caches[-1].delete(key, version=version)
+
+    def delete_many(self, keys, version=None):
+        self.caches[-1].delete_many(keys, version=version)
 
     def _get_with_fallthrough(self, key, index, default, version):
         cache = self.caches[index]
