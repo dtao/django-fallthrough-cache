@@ -40,6 +40,9 @@ class FallthroughCache(BaseCache):
     def delete_many(self, keys, version=None):
         self.caches[-1].delete_many(keys, version=version)
 
+    def clear(self):
+        self.caches[-1].clear()
+
     def _get_with_fallthrough(self, key, index, default, version):
         cache = self.caches[index]
         if index == len(self.caches) - 1:

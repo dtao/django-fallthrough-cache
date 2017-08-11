@@ -164,6 +164,18 @@ def test_delete_many():
     assert caches['c'].get_many(['foo', 'bar', 'baz']) == {'foo': 1}
 
 
+def test_clear_updates_bottom_cache():
+    cache = FallthroughCache.create(['a', 'b', 'c'])
+
+    caches['c'].set('foo', 1)
+    caches['c'].set('bar', 2)
+    caches['c'].set('baz', 3)
+
+    cache.clear()
+
+    assert caches['c'].get_many(['foo', 'bar', 'baz']) == {}
+
+
 def test_django_configuration():
     cache = caches['fallthrough']
 
