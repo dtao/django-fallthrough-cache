@@ -1,5 +1,5 @@
 from django.core.cache import caches
-from django.core.cache.backends.base import BaseCache
+from django.core.cache.backends.base import BaseCache, DEFAULT_TIMEOUT
 
 
 class FallthroughCache(BaseCache):
@@ -20,15 +20,16 @@ class FallthroughCache(BaseCache):
 
         self.caches = [caches[name] for name in cache_names]
 
-    def add(self, key, value, version=None, **kwargs):
-        return self.caches[-1].add(key, value, version=version)
+    def add(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
+        return self.caches[-1].add(key, value, timeout=timeout,
+                                   version=version)
 
     def get(self, key, default=None, version=None):
         return self._get_with_fallthrough(key, 0, default=default,
                                           version=version)
 
-    def set(self, key, value, version=None, **kwargs):
-        self.caches[-1].set(key, value, version=version)
+    def set(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
+        self.caches[-1].set(key, value, timeout=timeout, version=version)
 
     def delete(self, key, version=None):
         self.caches[-1].delete(key, version=version)
