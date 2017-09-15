@@ -25,8 +25,32 @@ class FallthroughCache(BaseCache):
                                    version=version)
 
     def get(self, key, default=None, version=None):
-        return self._get_with_fallthrough(key, 0, default=default,
-                                          version=version)
+        index = 0
+        value = None
+
+        while index < len(self.caches):
+            cache = self.caches[index]
+            if index == len(self.caches) - 1:
+                value = cache.get(key, default=default, version=version)
+            else:
+                value = cache.get(key, version=version)
+
+            if value is not None:
+                break
+
+            index += 1
+
+        # Only back-populate caches if a value other than None was retrieved
+        # This implementation is unfortunately necessary due to what I would
+        # describe as a bug in Django, which won't be fixed until 1.11.6 at the
+        # absolute earliest.
+        # https://github.com/django/django/pull/9087
+        if value is not None:
+            while index > 0:
+                index -= 1
+                self.caches[index].set(key, value, version=version)
+
+        return value
 
     def set(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
         self.caches[-1].set(key, value, timeout=timeout, version=version)
@@ -42,12 +66,3 @@ class FallthroughCache(BaseCache):
 
     def clear(self):
         self.caches[-1].clear()
-
-    def _get_with_fallthrough(self, key, index, default, version):
-        cache = self.caches[index]
-        if index == len(self.caches) - 1:
-            return cache.get(key, default=default, version=version)
-        return cache.get_or_set(
-            key, lambda: self._get_with_fallthrough(key, index + 1, default,
-                                                    version),
-            version=version)

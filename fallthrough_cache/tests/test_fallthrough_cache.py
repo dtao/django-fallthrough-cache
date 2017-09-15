@@ -64,6 +64,16 @@ def test_get_many():
     assert caches['b'].get('baz') == 3
 
 
+def test_get_or_set():
+    cache = FallthroughCache.create(['a', 'b'])
+
+    assert cache.get('foo') is None
+
+    # Previous call to get, returning None, should not have populated a
+    caches['b'].add('foo', 1)
+    assert cache.get('foo') == 1
+
+
 def test_get_falls_through():
     cache = FallthroughCache.create(['a', 'b', 'c'])
 
