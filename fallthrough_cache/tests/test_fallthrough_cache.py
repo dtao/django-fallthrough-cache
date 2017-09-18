@@ -64,6 +64,15 @@ def test_get_many():
     assert caches['b'].get('baz') == 3
 
 
+def test_get_or_set():
+    cache = FallthroughCache.create(['a', 'b'])
+
+    assert cache.get_or_set('foo', 5) == 5
+
+    assert cache.get('foo') == 5
+    assert caches['b'].get('foo') == 5
+
+
 def test_get_falls_through():
     cache = FallthroughCache.create(['a', 'b', 'c'])
 
