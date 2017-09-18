@@ -146,6 +146,23 @@ def test_set_many():
     }
 
 
+def test_set_many_invalidates_upper_caches():
+    cache = FallthroughCache.create(['a', 'b', 'c'])
+
+    caches['a'].set_many({'foo': 'a', 'bar': 'a', 'baz': 'a'})
+    caches['b'].set_many({'foo': 'b', 'bar': 'b', 'baz': 'b'})
+
+    cache.set_many({'foo': 1, 'bar': 2, 'baz': 3})
+
+    assert caches['a'].get_many(['foo', 'bar', 'baz']) == {}
+    assert caches['b'].get_many(['foo', 'bar', 'baz']) == {}
+    assert caches['c'].get_many(['foo', 'bar', 'baz']) == {
+        'foo': 1,
+        'bar': 2,
+        'baz': 3
+    }
+
+
 def test_add_updates_bottom_cache():
     cache = FallthroughCache.create(['a', 'b', 'c'])
 
