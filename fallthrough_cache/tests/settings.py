@@ -6,13 +6,13 @@ CACHES = {
     'a': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
         'LOCATION': 'a',
-        'TIMEOUT': None,
+        'TIMEOUT': 60,
         'VERSION': 1
     },
     'b': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
         'LOCATION': 'b',
-        'TIMEOUT': None,
+        'TIMEOUT': 3600,
         'VERSION': 1
     },
     'c': {
@@ -27,5 +27,11 @@ CACHES = {
         'OPTIONS': {
             'cache_names': ['a', 'b', 'c']
         }
+    },
+    'notimeout': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'notimeout',
+        'TIMEOUT': None,
+        'VERSION': 1
     }
 }

@@ -211,3 +211,8 @@ def test_django_configuration():
 def test_requires_at_least_one_cache():
     with pytest.raises(ValueError):
         FallthroughCache.create([])
+
+
+def test_non_root_caches_must_have_timeouts():
+    with pytest.raises(ValueError):
+        FallthroughCache.create(['notimeout', 'c'])

@@ -19,6 +19,10 @@ class FallthroughCache(BaseCache):
             raise ValueError('FallthroughCache requires at least 1 cache')
 
         self.caches = [caches[name] for name in cache_names]
+        if any(cache.default_timeout is None for cache in self.caches[0:-1]):
+            raise ValueError('All but the last cache used by FallthroughCache '
+                             'must have a timeout')
+
         self.root_cache = self.caches[-1]
 
     def add(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
