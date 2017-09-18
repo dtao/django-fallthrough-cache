@@ -19,9 +19,10 @@ class FallthroughCache(BaseCache):
             raise ValueError('FallthroughCache requires at least 1 cache')
 
         self.caches = [caches[name] for name in cache_names]
+        self.root_cache = self.caches[-1]
 
     def add(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
-        return self.caches[-1].add(key, value, timeout=timeout,
+        return self.root_cache.add(key, value, timeout=timeout,
                                    version=version)
 
     def get(self, key, default=None, version=None):
@@ -53,16 +54,16 @@ class FallthroughCache(BaseCache):
         return value
 
     def set(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
-        self.caches[-1].set(key, value, timeout=timeout, version=version)
+        self.root_cache.set(key, value, timeout=timeout, version=version)
 
     def set_many(self, data, timeout=DEFAULT_TIMEOUT, version=None):
-        self.caches[-1].set_many(data, timeout=timeout, version=version)
+        self.root_cache.set_many(data, timeout=timeout, version=version)
 
     def delete(self, key, version=None):
-        self.caches[-1].delete(key, version=version)
+        self.root_cache.delete(key, version=version)
 
     def delete_many(self, keys, version=None):
-        self.caches[-1].delete_many(keys, version=version)
+        self.root_cache.delete_many(keys, version=version)
 
     def clear(self):
-        self.caches[-1].clear()
+        self.root_cache.clear()
