@@ -64,16 +64,6 @@ def test_get_many():
     assert caches['b'].get('baz') == 3
 
 
-def test_get_or_set():
-    cache = FallthroughCache.create(['a', 'b'])
-
-    assert cache.get('foo') is None
-
-    # Previous call to get, returning None, should not have populated a
-    caches['b'].add('foo', 1)
-    assert cache.get('foo') == 1
-
-
 def test_get_falls_through():
     cache = FallthroughCache.create(['a', 'b', 'c'])
 
@@ -93,6 +83,16 @@ def test_get_falls_through():
     # Getting foo from c should have populated a and b
     assert caches['a'].get('foo') == 3
     assert caches['b'].get('foo') == 3
+
+
+def test_get_does_not_update_on_none():
+    cache = FallthroughCache.create(['a', 'b'])
+
+    assert cache.get('foo') is None
+
+    # Previous call to get, returning None, should not have populated a
+    caches['b'].add('foo', 1)
+    assert cache.get('foo') == 1
 
 
 def test_set_updates_bottom_cache():
