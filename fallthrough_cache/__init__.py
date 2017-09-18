@@ -60,6 +60,14 @@ class FallthroughCache(BaseCache):
     def set(self, key, value, timeout=DEFAULT_TIMEOUT, version=None):
         self.root_cache.set(key, value, timeout=timeout, version=version)
 
+        # Invalidate non-root caches to avoid surprising behavior where getting
+        # a value immediately after setting it (e.g. in the span of a single
+        # web request) returns a stale result.
+        index = len(self.caches) - 1
+        while index > 0:
+            index -= 1
+            self.caches[index].delete(key, version=version)
+
     def set_many(self, data, timeout=DEFAULT_TIMEOUT, version=None):
         self.root_cache.set_many(data, timeout=timeout, version=version)
 

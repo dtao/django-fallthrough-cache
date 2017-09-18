@@ -112,6 +112,18 @@ def test_set_updates_bottom_cache():
     assert caches['c'].get('foo') == 3
 
 
+def test_set_invalidates_upper_caches():
+    cache = FallthroughCache.create(['a', 'b', 'c'])
+
+    caches['a'].set('foo', 1)
+    caches['b'].set('foo', 2)
+    cache.set('foo', 3)
+
+    assert caches['a'].get('foo') is None
+    assert caches['b'].get('foo') is None
+    assert caches['c'].get('foo') == 3
+
+
 def test_set_respects_version():
     cache = FallthroughCache.create(['a', 'b', 'c'])
 
