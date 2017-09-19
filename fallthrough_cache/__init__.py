@@ -46,10 +46,8 @@ class FallthroughCache(BaseCache):
         # Invalidate non-root caches to avoid surprising behavior where getting
         # a value immediately after setting it (e.g. in the span of a single
         # web request) returns a stale result.
-        index = len(self.caches) - 1
-        while index > 0:
-            index -= 1
-            self.caches[index].delete(key, version=version)
+        for cache in reversed(self.caches[:-1]):
+            cache.delete(key, version=version)
 
     def set_many(self, data, timeout=DEFAULT_TIMEOUT, version=None):
         self.root_cache.set_many(data, timeout=timeout, version=version)
@@ -57,10 +55,8 @@ class FallthroughCache(BaseCache):
         # Invalidate non-root caches to avoid surprising behavior where getting
         # a value immediately after setting it (e.g. in the span of a single
         # web request) returns a stale result.
-        index = len(self.caches) - 1
-        while index > 0:
-            index -= 1
-            self.caches[index].delete_many(data.keys(), version=version)
+        for cache in reversed(self.caches[:-1]):
+            cache.delete_many(data.keys(), version=version)
 
     def delete(self, key, version=None):
         self.root_cache.delete(key, version=version)
