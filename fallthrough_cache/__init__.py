@@ -3,14 +3,6 @@ from django.core.cache.backends.base import BaseCache, DEFAULT_TIMEOUT
 
 
 class FallthroughCache(BaseCache):
-    @classmethod
-    def create(cls, cache_names):
-        return cls(None, {
-            'OPTIONS': {
-                'cache_names': cache_names
-            }
-        })
-
     def __init__(self, location, params):
         options = params.get('OPTIONS', {})
         cache_names = options.get('cache_names', [])

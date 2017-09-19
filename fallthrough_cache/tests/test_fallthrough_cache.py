@@ -11,8 +11,16 @@ def setup():
     caches['c'].clear()
 
 
+def create_fallthrough_cache(cache_names):
+    return FallthroughCache(None, {
+        'OPTIONS': {
+            'cache_names': cache_names
+        }
+    })
+
+
 def test_get_picks_first_result():
-    cache = FallthroughCache.create(['a', 'b', 'c'])
+    cache = create_fallthrough_cache(['a', 'b', 'c'])
 
     caches['a'].add('foo', 1)
     caches['b'].add('foo', 2)
@@ -22,7 +30,7 @@ def test_get_picks_first_result():
 
 
 def test_get_supports_default():
-    cache = FallthroughCache.create(['a', 'b', 'c'])
+    cache = create_fallthrough_cache(['a', 'b', 'c'])
 
     caches['a'].set('foo', 1)
     caches['b'].set('bar', 2)
@@ -32,7 +40,7 @@ def test_get_supports_default():
 
 
 def test_get_respects_version():
-    cache = FallthroughCache.create(['a', 'b', 'c'])
+    cache = create_fallthrough_cache(['a', 'b', 'c'])
 
     caches['a'].set('foo', 1, version=1)
     caches['b'].set('foo', 2, version=2)
@@ -48,7 +56,7 @@ def test_get_respects_version():
 
 
 def test_get_many():
-    cache = FallthroughCache.create(['a', 'b', 'c'])
+    cache = create_fallthrough_cache(['a', 'b', 'c'])
 
     caches['a'].add('foo', 1)
     caches['b'].add('bar', 2)
@@ -65,7 +73,7 @@ def test_get_many():
 
 
 def test_get_or_set():
-    cache = FallthroughCache.create(['a', 'b'])
+    cache = create_fallthrough_cache(['a', 'b'])
 
     assert cache.get_or_set('foo', 5) == 5
 
@@ -74,7 +82,7 @@ def test_get_or_set():
 
 
 def test_get_falls_through():
-    cache = FallthroughCache.create(['a', 'b', 'c'])
+    cache = create_fallthrough_cache(['a', 'b', 'c'])
 
     caches['b'].add('foo', 2)
     caches['c'].add('foo', 3)
@@ -95,7 +103,7 @@ def test_get_falls_through():
 
 
 def test_get_does_not_update_on_none():
-    cache = FallthroughCache.create(['a', 'b'])
+    cache = create_fallthrough_cache(['a', 'b'])
 
     assert cache.get('foo') is None
 
@@ -105,7 +113,7 @@ def test_get_does_not_update_on_none():
 
 
 def test_get_does_not_update_on_default():
-    cache = FallthroughCache.create(['a', 'b'])
+    cache = create_fallthrough_cache(['a', 'b'])
 
     assert cache.get('foo', default='bar') == 'bar'
 
@@ -115,7 +123,7 @@ def test_get_does_not_update_on_default():
 
 
 def test_set_updates_bottom_cache():
-    cache = FallthroughCache.create(['a', 'b', 'c'])
+    cache = create_fallthrough_cache(['a', 'b', 'c'])
 
     cache.set('foo', 3)
 
@@ -123,7 +131,7 @@ def test_set_updates_bottom_cache():
 
 
 def test_set_invalidates_upper_caches():
-    cache = FallthroughCache.create(['a', 'b', 'c'])
+    cache = create_fallthrough_cache(['a', 'b', 'c'])
 
     caches['a'].set('foo', 1)
     caches['b'].set('foo', 2)
@@ -135,7 +143,7 @@ def test_set_invalidates_upper_caches():
 
 
 def test_set_respects_version():
-    cache = FallthroughCache.create(['a', 'b', 'c'])
+    cache = create_fallthrough_cache(['a', 'b', 'c'])
 
     cache.set('foo', 3, version=2)
 
@@ -145,7 +153,7 @@ def test_set_respects_version():
 
 
 def test_set_many():
-    cache = FallthroughCache.create(['a', 'b', 'c'])
+    cache = create_fallthrough_cache(['a', 'b', 'c'])
 
     cache.set_many({'foo': 1, 'bar': 2, 'baz': 3})
 
@@ -157,7 +165,7 @@ def test_set_many():
 
 
 def test_set_many_invalidates_upper_caches():
-    cache = FallthroughCache.create(['a', 'b', 'c'])
+    cache = create_fallthrough_cache(['a', 'b', 'c'])
 
     caches['a'].set_many({'foo': 'a', 'bar': 'a', 'baz': 'a'})
     caches['b'].set_many({'foo': 'b', 'bar': 'b', 'baz': 'b'})
@@ -174,7 +182,7 @@ def test_set_many_invalidates_upper_caches():
 
 
 def test_add_updates_bottom_cache():
-    cache = FallthroughCache.create(['a', 'b', 'c'])
+    cache = create_fallthrough_cache(['a', 'b', 'c'])
 
     cache.add('foo', 1)
 
@@ -186,7 +194,7 @@ def test_add_updates_bottom_cache():
 
 
 def test_delete_updates_bottom_cache():
-    cache = FallthroughCache.create(['a', 'b', 'c'])
+    cache = create_fallthrough_cache(['a', 'b', 'c'])
 
     caches['a'].set('foo', 1)
     caches['b'].set('foo', 2)
@@ -198,7 +206,7 @@ def test_delete_updates_bottom_cache():
 
 
 def test_delete_respects_version():
-    cache = FallthroughCache.create(['a', 'b', 'c'])
+    cache = create_fallthrough_cache(['a', 'b', 'c'])
 
     caches['c'].set('foo', 1, version=1)
     caches['c'].set('foo', 2, version=2)
@@ -212,7 +220,7 @@ def test_delete_respects_version():
 
 
 def test_delete_many():
-    cache = FallthroughCache.create(['a', 'b', 'c'])
+    cache = create_fallthrough_cache(['a', 'b', 'c'])
 
     caches['c'].set('foo', 1)
     caches['c'].set('bar', 2)
@@ -223,7 +231,7 @@ def test_delete_many():
 
 
 def test_clear_updates_bottom_cache():
-    cache = FallthroughCache.create(['a', 'b', 'c'])
+    cache = create_fallthrough_cache(['a', 'b', 'c'])
 
     caches['c'].set('foo', 1)
     caches['c'].set('bar', 2)
@@ -258,9 +266,9 @@ def test_django_configuration():
 
 def test_requires_at_least_one_cache():
     with pytest.raises(ValueError):
-        FallthroughCache.create([])
+        create_fallthrough_cache([])
 
 
 def test_non_root_caches_must_have_timeouts():
     with pytest.raises(ValueError):
-        FallthroughCache.create(['notimeout', 'c'])
+        create_fallthrough_cache(['notimeout', 'c'])
