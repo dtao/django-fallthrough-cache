@@ -104,6 +104,16 @@ def test_get_does_not_update_on_none():
     assert cache.get('foo') == 1
 
 
+def test_get_does_not_update_on_default():
+    cache = FallthroughCache.create(['a', 'b'])
+
+    assert cache.get('foo', default='bar') == 'bar'
+
+    # Default value should not have been stored in any cache
+    assert caches['a'].get('foo') is None
+    assert caches['b'].get('foo') is None
+
+
 def test_set_updates_bottom_cache():
     cache = FallthroughCache.create(['a', 'b', 'c'])
 
