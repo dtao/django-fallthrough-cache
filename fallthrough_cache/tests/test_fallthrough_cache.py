@@ -193,16 +193,19 @@ def test_add_updates_bottom_cache():
     assert caches['c'].get('foo') == 1
 
 
-def test_delete_updates_bottom_cache():
+def test_delete_updates_all_caches():
     cache = create_fallthrough_cache(['a', 'b', 'c'])
 
-    caches['a'].set('foo', 1)
-    caches['b'].set('foo', 2)
-    caches['c'].set('foo', 3)
+    cache.set('foo', 1)
+
+    # Ensure upper caches are populated.
+    cache.get('foo')
 
     cache.delete('foo')
 
     assert caches['c'].get('foo') is None
+    assert caches['b'].get('foo') is None
+    assert caches['a'].get('foo') is None
 
 
 def test_delete_respects_version():
@@ -219,27 +222,42 @@ def test_delete_respects_version():
     assert caches['c'].get('foo', version=3) == 3
 
 
-def test_delete_many():
+def test_delete_many_updates_all_caches():
     cache = create_fallthrough_cache(['a', 'b', 'c'])
 
-    caches['c'].set('foo', 1)
-    caches['c'].set('bar', 2)
-    caches['c'].set('baz', 3)
+    cache.set_many({
+        'foo': 1,
+        'bar': 2,
+        'baz': 3
+    })
+
+    # Ensure upper caches are populated.
+    cache.get_many(['foo', 'bar', 'baz'])
 
     cache.delete_many(['bar', 'baz'])
+
     assert caches['c'].get_many(['foo', 'bar', 'baz']) == {'foo': 1}
+    assert caches['b'].get_many(['foo', 'bar', 'baz']) == {'foo': 1}
+    assert caches['a'].get_many(['foo', 'bar', 'baz']) == {'foo': 1}
 
 
-def test_clear_updates_bottom_cache():
+def test_clear_updates_all_caches():
     cache = create_fallthrough_cache(['a', 'b', 'c'])
 
-    caches['c'].set('foo', 1)
-    caches['c'].set('bar', 2)
-    caches['c'].set('baz', 3)
+    cache.set_many({
+        'foo': 1,
+        'bar': 2,
+        'baz': 3
+    })
+
+    # Ensure upper caches are populated.
+    cache.get_many(['foo', 'bar', 'baz'])
 
     cache.clear()
 
     assert caches['c'].get_many(['foo', 'bar', 'baz']) == {}
+    assert caches['b'].get_many(['foo', 'bar', 'baz']) == {}
+    assert caches['a'].get_many(['foo', 'bar', 'baz']) == {}
 
 
 def test_django_configuration():

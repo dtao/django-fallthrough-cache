@@ -53,8 +53,26 @@ class FallthroughCache(BaseCache):
     def delete(self, key, version=None):
         self.root_cache.delete(key, version=version)
 
+        # Invalidate non-root caches to avoid surprising behavior where a value
+        # is present immediately after deleting it (e.g. in the span of a
+        # single web request).
+        for cache in reversed(self.caches[:-1]):
+            cache.delete(key, version=version)
+
     def delete_many(self, keys, version=None):
         self.root_cache.delete_many(keys, version=version)
 
+        # Invalidate non-root caches to avoid surprising behavior where values
+        # are present immediately after deleting them (e.g. in the span of a
+        # single web request).
+        for cache in reversed(self.caches[:-1]):
+            cache.delete_many(keys, version=version)
+
     def clear(self):
         self.root_cache.clear()
+
+        # Invalidate non-root caches to avoid surprising behavior where values
+        # are present immediately after clearing them (e.g. in the span of a
+        # single web request).
+        for cache in reversed(self.caches[:-1]):
+            cache.clear()
