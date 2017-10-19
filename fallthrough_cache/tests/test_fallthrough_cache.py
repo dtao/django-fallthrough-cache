@@ -19,6 +19,47 @@ def create_fallthrough_cache(cache_names):
     })
 
 
+def test_comprehensive():
+    """Comprehensive test that runs through all major operations
+
+    This test *should* be redundant given the coverage of the other unit tests,
+    but this serves as a sanity check that a FallthroughCache works as expected
+    when performing many operations in sequence.
+    """
+    cache = create_fallthrough_cache(['a', 'b', 'c'])
+
+    assert cache.get('foo') is None
+
+    assert cache.add('foo', 1) == 1
+    assert cache.get('foo') == 1
+
+    # add should not change a value that's already there
+    assert cache.add('foo', 2) is False
+    assert cache.get('foo') == 1
+
+    cache.set('foo', 2)
+    assert cache.get('foo') == 2
+
+    cache.delete('foo')
+    assert cache.get('foo') is None
+
+    cache.set_many({'foo': 3, 'bar': 4, 'baz': 5})
+    assert cache.get_many(['foo', 'bar', 'baz']) == {
+        'foo': 3,
+        'bar': 4,
+        'baz': 5
+    }
+
+    cache.delete_many(['foo', 'bar'])
+    assert cache.get_many(['foo', 'bar', 'baz']) == {
+        'baz': 5
+    }
+
+    cache.set_many({'quux': 6, 'blargh': 7})
+    cache.clear()
+    assert cache.get_many(['baz', 'quux', 'blargh']) == {}
+
+
 def test_get_picks_first_result():
     cache = create_fallthrough_cache(['a', 'b', 'c'])
 
